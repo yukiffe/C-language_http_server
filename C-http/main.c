@@ -2,18 +2,9 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string>
-#include <algorithm>
-#include <vector>
 #include <Winsock2.h>
-#include <winsock.h>
-#include <Windows.h>
-#include <io.h>
-#include <locale.h>
-#include <wchar.h>
 
-#define PORT 3000
+#define PORT 80
 #define BUFFER 1024  
 
 char buffer[BUFFER];
@@ -30,6 +21,7 @@ int main() {
 	SOCKADDR_IN _server_address, _client_address;
 	int _server_address_length = sizeof(_server_address);
 	int _client_address_length = sizeof(_client_address);
+	memset(buffer, 0, sizeof(buffer));
 
 	if (WSAStartup(MAKEWORD(2, 0), &_window_socket_API_data) != 0) error("Start-Up");
 	_server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -42,13 +34,11 @@ int main() {
 
 	while (true) {
 		_client_socket = accept(_server_socket, (SOCKADDR*)(&_server_address), &_server_address_length);
-		if (_client_socket < 0) error("Accept");
+		if (_client_socket < 0)error("Accept");
 
-		char szInBuf[BUFFER];
-		memset(szInBuf, 0, sizeof(szInBuf));
-
-		recv(_client_socket, szInBuf, sizeof(szInBuf), 0);
-		send(_client_socket, resp, (int)strlen(resp), 0);
+		recv(_client_socket, buffer, sizeof(buffer), 0);
+		printf("%s", buffer);
+		send(_client_socket, resp, strlen(resp), 0);
 
 		closesocket(_client_socket);
 	}
