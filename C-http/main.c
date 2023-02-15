@@ -40,24 +40,18 @@ int main() {
 	if (bind(_server_socket, (SOCKADDR*)&_server_address, _server_address_length) != 0)error("Binding");
 	if (listen(_server_socket, SOMAXCONN) != 0) error("Listening");
 
-	char header[1024];
-	memset(header, 0, sizeof(header));
-
 	while (true) {
 		_client_socket = accept(_server_socket, (SOCKADDR*)(&_server_address), &_server_address_length);
 		if (_client_socket < 0) error("Accept");
 
-		closesocket(_server_socket);
-		char szBuf[BUFFER], szInBuf[BUFFER];
-		memset(szBuf, 0, sizeof(szBuf));
+		char szInBuf[BUFFER];
 		memset(szInBuf, 0, sizeof(szInBuf));
 
 		recv(_client_socket, szInBuf, sizeof(szInBuf), 0);
-		send(_client_socket, szBuf, (int)strlen(szBuf), 0);
+		send(_client_socket, resp, (int)strlen(resp), 0);
 
 		closesocket(_client_socket);
 	}
-
 	return 0;
 }
 
