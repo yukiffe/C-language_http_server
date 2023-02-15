@@ -18,10 +18,8 @@ void error(const char* _message);
 int main() {
 	WSADATA _window_socket_API_data;
 	SOCKET _server_socket, _client_socket;
-	SOCKADDR_IN _server_address, _client_address;
+	SOCKADDR_IN _server_address;
 	int _server_address_length = sizeof(_server_address);
-	int _client_address_length = sizeof(_client_address);
-	memset(buffer, 0, sizeof(buffer));
 
 	if (WSAStartup(MAKEWORD(2, 0), &_window_socket_API_data) != 0) error("Start-Up");
 	_server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -35,14 +33,11 @@ int main() {
 	while (true) {
 		_client_socket = accept(_server_socket, (SOCKADDR*)(&_server_address), &_server_address_length);
 		if (_client_socket < 0)error("Accept");
-
 		recv(_client_socket, buffer, sizeof(buffer), 0);
 		printf("%s", buffer);
 		send(_client_socket, resp, strlen(resp), 0);
-
 		closesocket(_client_socket);
 	}
-	return 0;
 }
 
 void error(const char* _message) {
