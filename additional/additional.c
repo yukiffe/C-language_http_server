@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <Winsock2.h>
 
 #define PORT 80
@@ -17,6 +18,18 @@ char resp[] = "HTTP/1.0 200 OK\r\n"
 void error(const char* _message);
 
 int main() {
+	
+	FILE* fp;
+	fp = fopen("index.html", "r");
+	char* str;
+	fseek(fp, 0, SEEK_END);
+	int size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	str = (char*)malloc(size);
+	fread(str, size, 1, fp);
+	printf("%d\n%s", size, str);
+	fclose(fp);
+
 	WSADATA _window_socket_API_data;
 	SOCKET _server_socket, _client_socket;
 	SOCKADDR_IN _server_address;
@@ -32,6 +45,12 @@ int main() {
 	if (listen(_server_socket, SOMAXCONN) != 0) error("Listening");
 
 	while (true) {
+		//코드 주요 에러
+		/*
+			react 공부 과정에서 사용한 localhost가 캐시인지 뭔가 이상해져서
+			GET을 2번 받아오고 코드가 난잡해지는 에러 -> IIS부터 이것저것 다쓰고 파일이 너무 많아서
+			아무리 찾아도 원인 발견 불가,.,,,,,
+		*/
 		_client_socket = accept(_server_socket, (SOCKADDR*)(&_server_address), &_server_address_length);
 		if (_client_socket < 0)error("Accept");
 		recv(_client_socket, buffer, sizeof(buffer), 0);
@@ -55,11 +74,16 @@ int main() {
 			strcat(resp, "<p>3</p>");
 			send(_client_socket, resp, strlen(resp), 0);
 		}
+		else if (!strcmp(routh, "http://localhost/4\r\n")) {
+			strcat(resp, str);
+			send(_client_socket, resp, strlen(resp), 0);
+		}
 		else {
 			send(_client_socket, resp, strlen(resp), 0);
 		}
 		closesocket(_client_socket);
 	}
+	free(str);
 }
 
 void error(const char* _message) {
