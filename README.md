@@ -1,2 +1,4 @@
-# C-language_http_server
-C-language_http_server
+Hello Coders
+
+this source is http server based on C-Language
+This source is only used the bsics.
